@@ -1,20 +1,14 @@
 package WebService::CloudProvider;
 
 use 5.010;
-use Any::Moose;
+use Mouse;
+
+# ABSTRACT: WebService::CloudProvider - an interface to cloudprovider.net's RESTful Web API using Web::API
+
+our $VERSION = '0.3'; # VERSION
+
 with 'Web::API';
 
-=head1 NAME
-
-WebService::CloudProvider - an interface to cloudprovider.net's RESTful Web API using Web::API
-
-=head1 VERSION
-
-Version 0.2.2
-
-=cut
-
-our $VERSION = '0.2';
 
 has 'commands' => (
     is      => 'rw',
@@ -69,6 +63,47 @@ has 'commands' => (
     },
 );
 
+
+sub commands {
+    my ($self) = @_;
+    return $self->commands;
+}
+
+
+sub BUILD {
+    my ($self) = @_;
+
+    $self->user_agent(__PACKAGE__ . ' ' . $VERSION);
+    $self->base_url('https://ams01.cloudprovider.net/virtual_machines');
+    $self->auth_type('basic');
+    $self->content_type('application/json');
+    $self->extension('json');
+    $self->wrapper('virtual_machine');
+    $self->mapping({
+            os        => 'template_id',
+            debian    => 1,
+            id        => 'label',
+            disk_size => 'primary_disk_size',
+    });
+
+    return $self;
+}
+
+
+1;    # End of WebService::CloudProvider
+
+__END__
+
+=pod
+
+=head1 NAME
+
+WebService::CloudProvider - WebService::CloudProvider - an interface to cloudprovider.net's RESTful Web API using Web::API
+
+=head1 VERSION
+
+version 0.3
+
 =head1 SYNOPSIS
 
 Quick summary of what the module does.
@@ -100,47 +135,13 @@ Perhaps a little code snippet.
 
 =head1 INTERNALS
 
-=cut
-
-sub commands {
-    my ($self) = @_;
-    return $self->commands;
-}
-
 =head2 BUILD
 
 basic configuration for the client API happens usually in the BUILD method when using Web::API
 
-=cut
-
-sub BUILD {
-    my ($self) = @_;
-
-    $self->user_agent(__PACKAGE__ . ' ' . $VERSION);
-    $self->base_url('https://ams01.cloudprovider.net/virtual_machines');
-    $self->auth_type('basic');
-    $self->content_type('application/json');
-    $self->extension('json');
-    $self->wrapper('virtual_machine');
-    $self->mapping({
-            os        => 'template_id',
-            debian    => 1,
-            id        => 'label',
-            disk_size => 'primary_disk_size',
-    });
-
-    return $self;
-}
-
-=head1 AUTHOR
-
-Tobias Kirschstein, C<< <lev at cpan.org> >>
-
 =head1 BUGS
 
-Please report any bugs or feature requests to C<bug-webservice-cloudprovider at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=WebService-CloudProvider>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+Please report any bugs or feature requests on GitHub's issue tracker L<https://github.com/nupfel/WebService-CloudProvider/issues>.
 
 =head1 SUPPORT
 
@@ -152,34 +153,34 @@ You can also look for information at:
 
 =over 4
 
-=item * RT: CPAN's request tracker (report bugs here)
+=item * GitHub repository
 
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=WebService-CloudProvider>
+L<https://github.com/nupfel/WebService-CloudProvider>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/module/WebService::CloudProvider>
 
 =item * AnnoCPAN: Annotated CPAN documentation
 
-L<http://annocpan.org/dist/WebService-CloudProvider>
+L<http://annocpan.org/dist/WebService::CloudProvider>
 
 =item * CPAN Ratings
 
-L<http://cpanratings.perl.org/d/WebService-CloudProvider>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/WebService-CloudProvider/>
+L<http://cpanratings.perl.org/d/WebService::CloudProvider>
 
 =back
 
-=head1 LICENSE AND COPYRIGHT
+=head1 AUTHOR
 
-Copyright 2013 Tobias Kirschstein.
+Tobias Kirschstein <lev@cpan.org>
 
-This program is free software; you can redistribute it and/or modify it
-under the terms of either: the GNU General Public License as published
-by the Free Software Foundation; or the Artistic License.
+=head1 COPYRIGHT AND LICENSE
 
-See http://dev.perl.org/licenses/ for more information.
+This software is Copyright (c) 2013 by Tobias Kirschstein.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
 
 =cut
-
-1;    # End of WebService::CloudProvider
